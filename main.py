@@ -2,24 +2,27 @@ import argparse
 import sys
 import subprocess
 
-def get_route(adresse,arg=None):
-    if arg:
-        try:
-            with subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
+def get_route(adresse, progressive=False, output_file=None):
+    try:
+        with subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,encoding='cp850') as process:
+            if progressive:
+                # Afficher la sortie en temps réel
                 for line in process.stdout:
                     print(line.strip())
-        except FileNotFoundError:
-            print("tracert not found")
-    else:
-        process = subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, text=True)
-        print(process.communicate()[0])
+            else:
+                # Lire toute la sortie après l'exécution
+                output, errors = process.communicate()
+                print(output)
 
-    if arg is not None and arg.isalpha():
-        process = subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, text=True)
-        with open(arg,"w") as file:
-            for line in process.stdout:
-                file.write(line)
+            # Enregistrer dans un fichier si spécifié
+            if output_file:
+                with open(output_file, "w") as file:
+                    file.writelines(process.stdout)
 
+    except FileNotFoundError:
+        print("Erreur : La commande 'tracert' est introuvable. Assurez-vous qu'elle est disponible sur votre système.")
+    except Exception as e:
+        print(f"Erreur : Une erreur est survenue lors de l'exécution de la commande tracert : {e}")
 
 
 def main():
@@ -29,16 +32,7 @@ def main():
     parser.add_argument("-o","--output-file", help="utilisation -o ou --output-file")
 
     args = parser.parse_args()
-    print(args)
-
-
-
-    if  sys.argv[2] in [ "-p","--progressive"]:
-        get_route(args.adresse, args.progressive)
-    elif sys.argv[2] in [ "-o","--output-file"]:
-        get_route(args.adresse, args.output_file)
-    else:
-        get_route(args.adresse)
+    get_route(adresse=args.adresse, progressive=args.progressive, output_file=args.output_file)
 
 
 
