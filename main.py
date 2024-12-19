@@ -1,38 +1,47 @@
-import subprocess
+import argparse
 import sys
+import subprocess
 
-def get_route(nomHote, output_file=None):
-    try:
-        process = subprocess.Popen(['tracert', nomHote], stdout=subprocess.PIPE, text=True)
-        if output_file:
-            with open(output_file, 'w') as file:
+def get_route(adresse,arg=None):
+    if arg:
+        try:
+            with subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
                 for line in process.stdout:
-                    file.write(line)
-                    print(line, end='')
-        else:
+                    print(line.strip())
+        except FileNotFoundError:
+            print("tracert not found")
+    else:
+        process = subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, text=True)
+        print(process.communicate()[0])
+
+    if arg is not None and arg.isalpha():
+        process = subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, text=True)
+        with open(arg,"w") as file:
             for line in process.stdout:
-                print(line, end='')
+                file.write(line)
 
-        process.communicate()
 
-    except Exception as e:
-        print(f"Erreur : {e}")
+
+def main():
+    parser = argparse.ArgumentParser(description="traceroute")
+    parser.add_argument("adresse",  help="adresse")
+    parser.add_argument(  "-p", "--progressive", nargs="?", const=True, help="utilisation -p ou --progressive")
+    parser.add_argument("-o","--output-file", help="utilisation -o ou --output-file")
+
+    args = parser.parse_args()
+    print(args)
+
+
+
+    if  sys.argv[2] in [ "-p","--progressive"]:
+        get_route(args.adresse, args.progressive)
+    elif sys.argv[2] in [ "-o","--output-file"]:
+        get_route(args.adresse, args.output_file)
+    else:
+        get_route(args.adresse)
+
+
+
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <URL or IP address> [-p] [-o <output-file>]")
-        sys.exit(1)
-
-    target = sys.argv[1]
-    progressive = '-p' in sys.argv
-    output_file = None
-
-    if '-o' in sys.argv:
-        output_file_index = sys.argv.index('-o') + 1
-        if output_file_index < len(sys.argv):
-            output_file = sys.argv[output_file_index]
-        else:
-            print("Erreur : Le paramètre '-o' doit être suivi du nom du fichier.")
-            sys.exit(1)
-
-    get_route(target, output_file)
+    main()
