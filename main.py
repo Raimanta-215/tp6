@@ -4,17 +4,22 @@ import subprocess
 def get_route(adresse, progressive=False, output_file=None):
     try:
         with subprocess.Popen(['tracert', adresse], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,encoding='cp850') as process:
+            output_lines = []
             if progressive:
                 for line in process.stdout:
+                    output_lines.append(line.strip())
                     print(line.strip())
             else:
                 output, errors = process.communicate()
                 print(output)
+                output_lines = output.splitlines()
 
             if output_file:
-                with open(output_file, "w") as file:
-                    for line in file:
-                        file.write(line)
+                try:
+                    with open(output_file, "w", encoding="utf-8") as file:
+                        file.write("\n".join(output_lines))
+                except FileNotFoundError:
+                    print('File not created')
 
     except FileNotFoundError:
         print("Erreur : La commande 'tracert' est introuvable. Assurez-vous qu'elle est disponible sur votre système.")

@@ -1,0 +1,14 @@
+
+Détermination de l'itinéraire vers google.com [2a00:1450:400e:810::200e]
+avec un maximum de 30 sauts :
+
+1    21 ms    14 ms    46 ms  2a02:a03f:649b:ae01:22b8:2bff:fe08:3a72
+2     *        *        *     Délai d'attente de la demande dépassé.
+3     *        *        *     Délai d'attente de la demande dépassé.
+4    32 ms     7 ms     8 ms  ae-60-106.ibrstr5.isp.proximus.be [2a02:a000:1:fffa::1]
+5    34 ms    12 ms    13 ms  2a02:a000:1:fffb::2
+6    47 ms    16 ms    16 ms  2001:4860:0:1::8acd
+7    43 ms    18 ms    16 ms  2001:4860:0:1::5a87
+8    20 ms    16 ms    18 ms  ams17s12-in-x0e.1e100.net [2a00:1450:400e:810::200e]
+
+Itinéraire déterminé.
